@@ -2,41 +2,59 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
-All colors MUST be HSL.
-*/
+/* Chat Story Video Generator Design System */
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
+    /* Modern Chat App Theme */
+    --background: 240 10% 3.9%;
+    --foreground: 0 0% 98%;
 
-    --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
+    --card: 240 10% 7%;
+    --card-foreground: 0 0% 98%;
 
-    --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
+    --popover: 240 10% 7%;
+    --popover-foreground: 0 0% 98%;
 
-    --primary: 222.2 47.4% 11.2%;
-    --primary-foreground: 210 40% 98%;
+    /* Primary - Discord/Chat Blue */
+    --primary: 235 85% 60%;
+    --primary-foreground: 0 0% 98%;
+    --primary-glow: 235 85% 70%;
 
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
+    /* Secondary - Subtle Chat Background */
+    --secondary: 240 7% 15%;
+    --secondary-foreground: 0 0% 98%;
 
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
+    --muted: 240 6% 12%;
+    --muted-foreground: 240 5% 64.9%;
 
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
+    --accent: 240 7% 15%;
+    --accent-foreground: 0 0% 98%;
 
     --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
+    --destructive-foreground: 0 0% 98%;
 
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 222.2 84% 4.9%;
+    --border: 240 6% 20%;
+    --input: 240 6% 20%;
+    --ring: 235 85% 60%;
 
-    --radius: 0.5rem;
+    /* Chat-specific colors */
+    --chat-bubble-sent: 235 85% 60%;
+    --chat-bubble-received: 240 6% 20%;
+    --chat-input: 240 6% 15%;
+    --online-indicator: 142 76% 36%;
+    
+    /* Gradients */
+    --gradient-primary: linear-gradient(135deg, hsl(235 85% 60%), hsl(235 85% 70%));
+    --gradient-card: linear-gradient(145deg, hsl(240 10% 7%), hsl(240 8% 9%));
+    --gradient-glow: radial-gradient(circle at center, hsl(235 85% 60% / 0.3), transparent 70%);
+    
+    /* Shadows */
+    --shadow-chat: 0 4px 20px hsl(235 85% 60% / 0.2);
+    --shadow-card: 0 8px 32px hsl(240 10% 2% / 0.4);
+    --shadow-glow: 0 0 40px hsl(235 85% 60% / 0.3);
+
+    --radius: 0.75rem;
 
     --sidebar-background: 0 0% 98%;
 
@@ -102,4 +120,72 @@ All colors MUST be HSL.
   body {
     @apply bg-background text-foreground;
   }
+}
+
+@layer components {
+  /* Chat Bubble Animations */
+  .chat-bubble-appear {
+    @apply animate-[fadeInUp_0.3s_ease-out_forwards];
+  }
+  
+  .typing-indicator {
+    @apply animate-pulse;
+  }
+  
+  /* Custom Button Variants */
+  .btn-glow {
+    @apply bg-gradient-to-r from-primary to-primary-glow shadow-[var(--shadow-glow)] hover:scale-105 transition-all duration-300;
+  }
+  
+  .card-glow {
+    @apply bg-[var(--gradient-card)] shadow-[var(--shadow-card)] border border-border/20;
+  }
+  
+  /* Chat Message Styles */
+  .message-sent {
+    @apply bg-[hsl(var(--chat-bubble-sent))] text-white rounded-2xl rounded-br-md;
+  }
+  
+  .message-received {
+    @apply bg-[hsl(var(--chat-bubble-received))] text-foreground rounded-2xl rounded-bl-md;
+  }
+}
+
+@layer utilities {
+  .text-glow {
+    text-shadow: 0 0 20px hsl(var(--primary-glow) / 0.5);
+  }
+}
+
+/* Keyframes */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
 }
