@@ -11,6 +11,10 @@ export interface Message {
   text: string;
   timestamp: number;
   delay?: number; // seconds to wait before showing this message
+  typingDuration?: number; // duration to show typing indicator
+  reaction?: string; // emoji reaction
+  imageUrl?: string; // for image messages
+  showTimestamp?: boolean; // whether to show timestamp
 }
 
 export interface ChatScript {
@@ -20,9 +24,18 @@ export interface ChatScript {
 export interface VideoSettings {
   theme: 'light' | 'dark';
   backgroundImage?: string;
+  backgroundColor?: string; // custom background color
   musicTrack?: string;
   duration: number;
   messageSpeed: number; // typing speed in ms per character
+  animationSpeed: 'slow' | 'normal' | 'fast';
+  fontFamily: 'system' | 'handwriting' | 'typewriter' | 'modern';
+  senderBubbleColor?: string;
+  receiverBubbleColor?: string;
+  chatBackgroundColor?: string;
+  resolution: '720p' | '1080p';
+  watermarkImage?: string;
+  watermarkPosition: 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right';
 }
 
 export interface Project {

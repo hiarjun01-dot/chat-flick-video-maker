@@ -5,7 +5,7 @@ import { Card } from '@/components/ui/card';
 import { Steps } from '@/components/ui/steps';
 import { CharacterManager } from '@/components/CharacterManager';
 import { ScriptEditor } from '@/components/ScriptEditor';
-import { VideoCustomizer } from '@/components/VideoCustomizer';
+import { VideoCustomizerV2 } from '@/components/VideoCustomizerV2';
 import { VideoGenerator } from '@/components/VideoGenerator';
 import { useProjectStore } from '@/stores/projectStore';
 import heroImage from '@/assets/hero-chat.jpg';
@@ -80,7 +80,7 @@ export const ChatStoryApp: React.FC = () => {
       case 'script':
         return <ScriptEditor />;
       case 'customize':
-        return <VideoCustomizer />;
+        return <VideoCustomizerV2 />;
       case 'generate':
         return <VideoGenerator />;
       default:

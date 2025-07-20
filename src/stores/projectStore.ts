@@ -23,12 +23,18 @@ interface ProjectState {
   createNewProject: (name: string) => void;
   loadProject: (project: Project) => void;
   resetProject: () => void;
+  saveProjectToFile: () => void;
+  loadProjectFromFile: (file: File) => Promise<void>;
 }
 
 const defaultSettings: VideoSettings = {
   theme: 'dark',
   duration: 30,
   messageSpeed: 50,
+  animationSpeed: 'normal',
+  fontFamily: 'system',
+  resolution: '1080p',
+  watermarkPosition: 'bottom-right',
 };
 
 export const useProjectStore = create<ProjectState>((set, get) => ({
@@ -132,4 +138,44 @@ export const useProjectStore = create<ProjectState>((set, get) => ({
     currentStep: 'characters',
     completedSteps: [],
   }),
+
+  saveProjectToFile: () => {
+    const state = get();
+    const projectData: Project = {
+      id: state.currentProject?.id || crypto.randomUUID(),
+      name: state.currentProject?.name || 'Untitled Project',
+      characters: state.characters,
+      script: { messages: state.messages },
+      settings: state.settings,
+      createdAt: state.currentProject?.createdAt || Date.now(),
+      updatedAt: Date.now(),
+    };
+
+    const dataStr = JSON.stringify(projectData, null, 2);
+    const dataBlob = new Blob([dataStr], { type: 'application/json' });
+    
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(dataBlob);
+    link.download = `${projectData.name.replace(/[^a-z0-9]/gi, '_').toLowerCase()}.json`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  },
+
+  loadProjectFromFile: async (file: File) => {
+    try {
+      const text = await file.text();
+      const project: Project = JSON.parse(text);
+      
+      // Validate project structure
+      if (!project.id || !project.name || !project.characters || !project.script) {
+        throw new Error('Invalid project file format');
+      }
+
+      get().loadProject(project);
+    } catch (error) {
+      console.error('Failed to load project:', error);
+      throw new Error('Failed to load project file. Please check the file format.');
+    }
+  },
 }));
