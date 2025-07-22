@@ -18,6 +18,7 @@ interface ProjectState {
   addMessage: (message: Omit<Message, 'id' | 'timestamp'>) => void;
   updateMessage: (id: string, updates: Partial<Message>) => void;
   deleteMessage: (id: string) => void;
+  clearMessages: () => void;
   reorderMessages: (messages: Message[]) => void;
   updateSettings: (settings: Partial<VideoSettings>) => void;
   createNewProject: (name: string) => void;
@@ -94,6 +95,8 @@ export const useProjectStore = create<ProjectState>((set, get) => ({
   deleteMessage: (id) => set((state) => ({
     messages: state.messages.filter(msg => msg.id !== id)
   })),
+
+  clearMessages: () => set({ messages: [] }),
 
   reorderMessages: (messages) => set({ messages }),
 

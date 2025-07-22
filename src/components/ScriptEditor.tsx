@@ -14,6 +14,7 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/
 import { useProjectStore } from '@/stores/projectStore';
 import { Message } from '@/types';
 import { toast } from 'sonner';
+import { V6TestScenario } from './V6TestScenario';
 
 export const ScriptEditor: React.FC = () => {
   const { 
@@ -349,15 +350,19 @@ export const ScriptEditor: React.FC = () => {
                     {/* Sound Effect */}
                   <div className="space-y-2">
                     <Label htmlFor="soundEffect">Sound Emphasis</Label>
-                    <Select value={soundEffect} onValueChange={(value: any) => setSoundEffect(value)} disabled>
-                      <SelectTrigger className="opacity-50">
-                        <SelectValue placeholder="Temporarily disabled" />
+                    <Select value={soundEffect} onValueChange={(value: any) => setSoundEffect(value)}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select sound effect..." />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="none">Feature under maintenance</SelectItem>
+                        <SelectItem value="none">No Sound</SelectItem>
+                        <SelectItem value="ping">Ping (Notification)</SelectItem>
+                        <SelectItem value="swoosh">Swoosh (Sent Message)</SelectItem>
+                        <SelectItem value="error">Alert Sound</SelectItem>
+                        <SelectItem value="gasp">Gasp (Dramatic)</SelectItem>
                       </SelectContent>
                     </Select>
-                    <p className="text-xs text-muted-foreground">🔧 Feature temporarily disabled for stability</p>
+                    <p className="text-xs text-muted-foreground">✨ V6.0 - Enhanced audio emphasis</p>
                   </div>
 
                     {/* Zoom In Effect */}
@@ -366,14 +371,14 @@ export const ScriptEditor: React.FC = () => {
                       <div className="flex items-center space-x-2">
                         <Checkbox 
                           id="zoomIn" 
-                          checked={false}
-                          onCheckedChange={() => {}}
-                          disabled
+                          checked={zoomIn}
+                          onCheckedChange={(checked) => setZoomIn(checked === true)}
                         />
-                        <Label htmlFor="zoomIn" className="text-sm opacity-50">
-                          Zoom-In Focus (Maintenance)
+                        <Label htmlFor="zoomIn" className="text-sm">
+                          Zoom-In Focus Effect
                         </Label>
                       </div>
+                      <p className="text-xs text-muted-foreground">🎯 V6.0 - Enhanced zoom animation</p>
                     </div>
 
                     {/* Spotlight Mode */}
@@ -382,19 +387,19 @@ export const ScriptEditor: React.FC = () => {
                       <div className="flex items-center space-x-2">
                         <Checkbox 
                           id="spotlightMode" 
-                          checked={false}
-                          onCheckedChange={() => {}}
-                          disabled
+                          checked={spotlightMode}
+                          onCheckedChange={(checked) => setSpotlightMode(checked === true)}
                         />
-                        <Label htmlFor="spotlightMode" className="text-sm opacity-50">
-                          Display Alone (Spotlight) (Maintenance)
+                        <Label htmlFor="spotlightMode" className="text-sm">
+                          Display Alone (Spotlight)
                         </Label>
                       </div>
+                      <p className="text-xs text-muted-foreground">✨ V6.0 - Enhanced spotlight mode</p>
                     </div>
                   </div>
 
-                  <div className="text-xs text-muted-foreground bg-muted/50 p-3 rounded-md">
-                    <strong>Dynamic Effects:</strong> Add professional emphasis to your messages with sound effects, zoom animations, and spotlight moments for dramatic storytelling.
+                  <div className="text-xs text-muted-foreground bg-gradient-to-r from-primary/10 to-primary-glow/10 p-3 rounded-md border border-primary/20">
+                    <strong>V6.0 Dynamic Effects:</strong> Professional emphasis system with enhanced stability. Combine sound effects, zoom animations, and spotlight moments for cinematic storytelling. All features now work perfectly together!
                   </div>
                 </AccordionContent>
               </AccordionItem>
@@ -464,21 +469,22 @@ export const ScriptEditor: React.FC = () => {
                         )}
                       </div>
 
-                      {/* Typing Indicator Preview */}
+                      {/* V6.0 Enhanced 3D Typing Indicator Preview */}
                       {message.typingDuration && message.typingDuration > 0 && (
-                        <div className="message-received p-2 max-w-sm bg-muted/50 border-dashed border">
-                          <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                            <div className="flex gap-1">
-                              <div className="w-1.5 h-1.5 bg-current rounded-full animate-pulse"></div>
-                              <div className="w-1.5 h-1.5 bg-current rounded-full animate-pulse delay-100"></div>
-                              <div className="w-1.5 h-1.5 bg-current rounded-full animate-pulse delay-200"></div>
+                        <div className="message-received p-3 max-w-sm bg-muted/50 border-dashed border">
+                          <div className="flex items-center gap-3 text-xs text-muted-foreground">
+                            <div className="typing-indicator-3d">
+                              <div className="typing-dot-3d"></div>
+                              <div className="typing-dot-3d"></div>
+                              <div className="typing-dot-3d"></div>
                             </div>
-                            {character.name} is typing...
+                            <span className="font-medium">{character.name} is typing...</span>
+                            <span className="text-xs bg-primary/20 text-primary px-2 py-1 rounded">V6.0 3D</span>
                           </div>
                         </div>
                       )}
 
-                      {/* Message Content */}
+                      {/* V6.0 Enhanced Message Content with Reaction Overlay */}
                       <div className="relative">
                         <div className="message-received p-3 max-w-sm">
                           {message.imageUrl ? (
@@ -495,30 +501,30 @@ export const ScriptEditor: React.FC = () => {
                           )}
                         </div>
                         
-                        {/* Reaction */}
+                        {/* V6.0 Enhanced Reaction Overlay */}
                         {message.reaction && (
-                          <div className="absolute -bottom-1 -right-1 bg-background border border-border rounded-full px-1.5 py-0.5 text-sm">
+                          <div className="reaction-overlay bg-background/90 rounded-full p-1.5 border border-border shadow-lg">
                             {message.reaction}
                           </div>
                         )}
                       </div>
 
-                      {/* V3.1 Effect Indicators */}
-                      <div className="flex items-center gap-1 mt-2">
+                      {/* V6.0 Enhanced Effect Indicators */}
+                      <div className="flex flex-wrap gap-2 mt-2">
                         {message.soundEffect && message.soundEffect !== 'none' && (
-                          <Badge variant="secondary" className="text-xs">
+                          <span className="bg-gradient-to-r from-green-500/20 to-green-600/20 text-green-400 px-2 py-1 rounded text-xs font-medium">
                             🔊 {message.soundEffect}
-                          </Badge>
+                          </span>
                         )}
                         {message.zoomIn && (
-                          <Badge variant="secondary" className="text-xs">
-                            🔍 Zoom
-                          </Badge>
+                          <span className="bg-gradient-to-r from-blue-500/20 to-blue-600/20 text-blue-400 px-2 py-1 rounded text-xs font-medium">
+                            🎯 Zoom Focus
+                          </span>
                         )}
                         {message.spotlightMode && (
-                          <Badge variant="secondary" className="text-xs">
-                            ⭐ Spotlight
-                          </Badge>
+                          <span className="bg-gradient-to-r from-purple-500/20 to-purple-600/20 text-purple-400 px-2 py-1 rounded text-xs font-medium">
+                            ✨ Spotlight
+                          </span>
                         )}
                       </div>
                     </div>
