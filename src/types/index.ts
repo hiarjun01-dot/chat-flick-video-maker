@@ -15,6 +15,10 @@ export interface Message {
   reaction?: string; // emoji reaction
   imageUrl?: string; // for image messages
   showTimestamp?: boolean; // whether to show timestamp
+  // V3.1 Dynamic Effects
+  soundEffect?: 'none' | 'ping' | 'swoosh' | 'error' | 'gasp'; // sound emphasis
+  zoomIn?: boolean; // zoom-in focus effect
+  spotlightMode?: boolean; // display alone mode
 }
 
 export interface ChatScript {

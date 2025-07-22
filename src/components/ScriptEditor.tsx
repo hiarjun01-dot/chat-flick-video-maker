@@ -8,6 +8,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Switch } from '@/components/ui/switch';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Badge } from '@/components/ui/badge';
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { useProjectStore } from '@/stores/projectStore';
 import { Message } from '@/types';
 import { toast } from 'sonner';
@@ -31,6 +34,10 @@ export const ScriptEditor: React.FC = () => {
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string>('');
   const [showTimestamp, setShowTimestamp] = useState(false);
+  // V3.1 Dynamic Effects
+  const [soundEffect, setSoundEffect] = useState<'none' | 'ping' | 'swoosh' | 'error' | 'gasp'>('none');
+  const [zoomIn, setZoomIn] = useState(false);
+  const [spotlightMode, setSpotlightMode] = useState(false);
 
   const handleAddMessage = () => {
     if (!selectedCharacterId) {
@@ -56,6 +63,10 @@ export const ScriptEditor: React.FC = () => {
       reaction: selectedReaction || undefined,
       imageUrl: imagePreview || undefined,
       showTimestamp,
+      // V3.1 Dynamic Effects
+      soundEffect: soundEffect !== 'none' ? soundEffect : undefined,
+      zoomIn,
+      spotlightMode,
     });
 
     // Reset form
@@ -65,6 +76,10 @@ export const ScriptEditor: React.FC = () => {
     setImagePreview('');
     setShowTimestamp(false);
     setMessageType('text');
+    // Reset V3.1 effects
+    setSoundEffect('none');
+    setZoomIn(false);
+    setSpotlightMode(false);
     toast.success('Message added to script');
     
     // Mark step as completed if we have messages
@@ -272,46 +287,119 @@ export const ScriptEditor: React.FC = () => {
           </Tabs>
 
           {/* Advanced Options */}
-          <div className="border-t pt-4 space-y-4">
-            <h4 className="font-medium flex items-center gap-2">
-              <Smile className="w-4 h-4" />
-              Advanced Options
-            </h4>
+          <div className="border-t pt-4">
+            <Accordion type="single" collapsible className="w-full">
+              <AccordionItem value="basic">
+                <AccordionTrigger>
+                  <h4 className="font-medium flex items-center gap-2">
+                    <Smile className="w-4 h-4" />
+                    Basic Options
+                  </h4>
+                </AccordionTrigger>
+                <AccordionContent className="space-y-4">
+                  {/* Reactions */}
+                  <div className="space-y-2">
+                    <Label>Add Reaction (optional)</Label>
+                    <div className="flex flex-wrap gap-2">
+                      {reactions.map(reaction => (
+                        <Button
+                          key={reaction}
+                          size="sm"
+                          variant={selectedReaction === reaction ? "default" : "outline"}
+                          onClick={() => setSelectedReaction(selectedReaction === reaction ? '' : reaction)}
+                          className="text-lg p-2 h-10 w-10"
+                        >
+                          {reaction}
+                        </Button>
+                      ))}
+                    </div>
+                  </div>
 
-            {/* Reactions */}
-            <div className="space-y-2">
-              <Label>Add Reaction (optional)</Label>
-              <div className="flex flex-wrap gap-2">
-                {reactions.map(reaction => (
-                  <Button
-                    key={reaction}
-                    size="sm"
-                    variant={selectedReaction === reaction ? "default" : "outline"}
-                    onClick={() => setSelectedReaction(selectedReaction === reaction ? '' : reaction)}
-                    className="text-lg p-2 h-10 w-10"
-                  >
-                    {reaction}
-                  </Button>
-                ))}
-              </div>
-            </div>
+                  {/* Timestamp Toggle */}
+                  <div className="flex items-center justify-between">
+                    <div className="space-y-1">
+                      <Label className="flex items-center gap-2">
+                        <Clock className="w-4 h-4" />
+                        Show Timestamp
+                      </Label>
+                      <p className="text-sm text-muted-foreground">
+                        Display message time ({generateTimestamp()})
+                      </p>
+                    </div>
+                    <Switch
+                      checked={showTimestamp}
+                      onCheckedChange={setShowTimestamp}
+                    />
+                  </div>
+                </AccordionContent>
+              </AccordionItem>
 
-            {/* Timestamp Toggle */}
-            <div className="flex items-center justify-between">
-              <div className="space-y-1">
-                <Label className="flex items-center gap-2">
-                  <Clock className="w-4 h-4" />
-                  Show Timestamp
-                </Label>
-                <p className="text-sm text-muted-foreground">
-                  Display message time ({generateTimestamp()})
-                </p>
-              </div>
-              <Switch
-                checked={showTimestamp}
-                onCheckedChange={setShowTimestamp}
-              />
-            </div>
+              {/* V3.1 Dynamic Effects */}
+              <AccordionItem value="effects">
+                <AccordionTrigger>
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm bg-gradient-primary text-primary-foreground px-2 py-1 rounded-md font-medium">
+                      V3.1
+                    </span>
+                    Dynamic Effects
+                  </div>
+                </AccordionTrigger>
+                <AccordionContent className="space-y-4">
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    {/* Sound Effect */}
+                    <div className="space-y-2">
+                      <Label htmlFor="soundEffect">Sound Emphasis</Label>
+                      <Select value={soundEffect} onValueChange={(value: any) => setSoundEffect(value)}>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select sound" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="none">None</SelectItem>
+                          <SelectItem value="ping">Notification Ping</SelectItem>
+                          <SelectItem value="swoosh">Swoosh</SelectItem>
+                          <SelectItem value="error">Error</SelectItem>
+                          <SelectItem value="gasp">Gasp</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    {/* Zoom In Effect */}
+                    <div className="space-y-2">
+                      <Label>Visual Effects</Label>
+                      <div className="flex items-center space-x-2">
+                        <Checkbox 
+                          id="zoomIn" 
+                          checked={zoomIn}
+                          onCheckedChange={(checked) => setZoomIn(checked === true)}
+                        />
+                        <Label htmlFor="zoomIn" className="text-sm">
+                          Zoom-In Focus
+                        </Label>
+                      </div>
+                    </div>
+
+                    {/* Spotlight Mode */}
+                    <div className="space-y-2">
+                      <Label>Display Mode</Label>
+                      <div className="flex items-center space-x-2">
+                        <Checkbox 
+                          id="spotlightMode" 
+                          checked={spotlightMode}
+                          onCheckedChange={(checked) => setSpotlightMode(checked === true)}
+                        />
+                        <Label htmlFor="spotlightMode" className="text-sm">
+                          Display Alone (Spotlight)
+                        </Label>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="text-xs text-muted-foreground bg-muted/50 p-3 rounded-md">
+                    <strong>Dynamic Effects:</strong> Add professional emphasis to your messages with sound effects, zoom animations, and spotlight moments for dramatic storytelling.
+                  </div>
+                </AccordionContent>
+              </AccordionItem>
+            </Accordion>
           </div>
 
           {/* Add Message Button */}
@@ -413,6 +501,25 @@ export const ScriptEditor: React.FC = () => {
                           <div className="absolute -bottom-1 -right-1 bg-background border border-border rounded-full px-1.5 py-0.5 text-sm">
                             {message.reaction}
                           </div>
+                        )}
+                      </div>
+
+                      {/* V3.1 Effect Indicators */}
+                      <div className="flex items-center gap-1 mt-2">
+                        {message.soundEffect && message.soundEffect !== 'none' && (
+                          <Badge variant="secondary" className="text-xs">
+                            🔊 {message.soundEffect}
+                          </Badge>
+                        )}
+                        {message.zoomIn && (
+                          <Badge variant="secondary" className="text-xs">
+                            🔍 Zoom
+                          </Badge>
+                        )}
+                        {message.spotlightMode && (
+                          <Badge variant="secondary" className="text-xs">
+                            ⭐ Spotlight
+                          </Badge>
                         )}
                       </div>
                     </div>
