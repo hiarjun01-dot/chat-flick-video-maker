@@ -173,10 +173,10 @@ export const VideoGeneratorV3: React.FC = () => {
       // Add message delay
       currentTime += message.delay || 1;
 
-      // Handle spotlight mode - clear previous messages if enabled
-      if (message.spotlightMode) {
-        visibleMessages = [];
-      }
+      // DISABLED: Spotlight mode temporarily disabled for stability
+      // if (message.spotlightMode) {
+      //   visibleMessages = [];
+      // }
 
       // Add the message
       const messageData = {
@@ -201,29 +201,29 @@ export const VideoGeneratorV3: React.FC = () => {
         spotlightMessage: message.spotlightMode ? message.id : undefined
       });
 
-      // Add zoom-in effect frame if enabled
-      if (message.zoomIn) {
-        frames.push({
-          messages: [...visibleMessages],
-          time: currentTime + 0.2,
-          zoomTarget: message.id
-        });
+      // DISABLED: Zoom-in effects temporarily disabled for stability
+      // if (message.zoomIn) {
+      //   frames.push({
+      //     messages: [...visibleMessages],
+      //     time: currentTime + 0.2,
+      //     zoomTarget: message.id
+      //   });
 
-        // Hold zoom for 1 second
-        frames.push({
-          messages: [...visibleMessages],
-          time: currentTime + 1.2,
-          zoomTarget: message.id
-        });
+      //   // Hold zoom for 1 second
+      //   frames.push({
+      //     messages: [...visibleMessages],
+      //     time: currentTime + 1.2,
+      //     zoomTarget: message.id
+      //   });
 
-        // Zoom out
-        frames.push({
-          messages: [...visibleMessages],
-          time: currentTime + 1.5
-        });
+      //   // Zoom out
+      //   frames.push({
+      //     messages: [...visibleMessages],
+      //     time: currentTime + 1.5
+      //   });
 
-        currentTime += 1.5;
-      }
+      //   currentTime += 1.5;
+      // }
     });
 
     return frames;
@@ -281,10 +281,8 @@ export const VideoGeneratorV3: React.FC = () => {
     const messageSpacing = 100;
     const messageMaxWidth = width - 160;
 
-    // Filter messages for spotlight mode
-    const messagesToShow = frame.spotlightMessage 
-      ? frame.messages.filter(msg => msg.id === frame.spotlightMessage)
-      : frame.messages;
+    // DISABLED: Spotlight filtering temporarily disabled for stability
+    const messagesToShow = frame.messages;
 
     messagesToShow.forEach((message, index) => {
       const character = getCharacterById(message.characterId);
@@ -484,12 +482,10 @@ export const VideoGeneratorV3: React.FC = () => {
     ctx.restore();
   };
 
-  // Play sound effect
+  // DISABLED: Sound effects temporarily disabled for stability
   const playSoundEffect = (effect: string) => {
-    if (effect === 'none' || !effect) return;
-    
-    // In a real implementation, you would play actual audio files
-    console.log(`Playing sound effect: ${effect}`);
+    // Feature temporarily disabled for maintenance
+    return;
   };
 
   const startAnimation = async () => {
@@ -510,33 +506,33 @@ export const VideoGeneratorV3: React.FC = () => {
         if (frameIndex < frames.length) {
           const frame = frames[frameIndex];
           
-          // Calculate zoom and offset for zoom effect
+          // DISABLED: Zoom effects temporarily disabled for stability
           let scale = 1;
           let offsetX = 0;
           let offsetY = 0;
           
-          if (frame.zoomTarget) {
-            scale = 1.5;
-            offsetX = -200;
-            offsetY = -300;
-          }
+          // if (frame.zoomTarget) {
+          //   scale = 1.5;
+          //   offsetX = -200;
+          //   offsetY = -300;
+          // }
           
           drawFrame(frame, scale, offsetX, offsetY);
           setCurrentFrame(frameIndex);
           
-          // Play sound effects
-          if (frameIndex > 0) {
-            const prevFrame = frames[frameIndex - 1];
-            const currentMessages = frame.messages;
-            const prevMessages = prevFrame.messages;
-            
-            // Find new messages and play their sound effects
-            currentMessages.forEach(msg => {
-              if (!prevMessages.find(pm => pm.id === msg.id) && msg.soundEffect) {
-                playSoundEffect(msg.soundEffect);
-              }
-            });
-          }
+          // DISABLED: Sound effects temporarily disabled for stability
+          // if (frameIndex > 0) {
+          //   const prevFrame = frames[frameIndex - 1];
+          //   const currentMessages = frame.messages;
+          //   const prevMessages = prevFrame.messages;
+          //   
+          //   // Find new messages and play their sound effects
+          //   currentMessages.forEach(msg => {
+          //     if (!prevMessages.find(pm => pm.id === msg.id) && msg.soundEffect) {
+          //       playSoundEffect(msg.soundEffect);
+          //     }
+          //   });
+          // }
           
           frameIndex++;
           animationRef.current = setTimeout(animate, frameDuration);
@@ -616,16 +612,16 @@ export const VideoGeneratorV3: React.FC = () => {
       for (let i = 0; i < frames.length; i++) {
         const frame = frames[i];
         
-        // Calculate zoom and offset for zoom effect
+        // DISABLED: Zoom effects temporarily disabled for stability
         let scale = 1;
         let offsetX = 0;
         let offsetY = 0;
         
-        if (frame.zoomTarget) {
-          scale = 1.5;
-          offsetX = -200;
-          offsetY = -300;
-        }
+        // if (frame.zoomTarget) {
+        //   scale = 1.5;
+        //   offsetX = -200;
+        //   offsetY = -300;
+        // }
         
         drawFrame(frame, scale, offsetX, offsetY);
         setGenerationProgress((i / frames.length) * 100);
