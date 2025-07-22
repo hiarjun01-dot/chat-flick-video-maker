@@ -347,21 +347,18 @@ export const ScriptEditor: React.FC = () => {
                 <AccordionContent className="space-y-4">
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     {/* Sound Effect */}
-                    <div className="space-y-2">
-                      <Label htmlFor="soundEffect">Sound Emphasis</Label>
-                      <Select value={soundEffect} onValueChange={(value: any) => setSoundEffect(value)}>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select sound" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="none">None</SelectItem>
-                          <SelectItem value="ping">Notification Ping</SelectItem>
-                          <SelectItem value="swoosh">Swoosh</SelectItem>
-                          <SelectItem value="error">Error</SelectItem>
-                          <SelectItem value="gasp">Gasp</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="soundEffect">Sound Emphasis</Label>
+                    <Select value={soundEffect} onValueChange={(value: any) => setSoundEffect(value)} disabled>
+                      <SelectTrigger className="opacity-50">
+                        <SelectValue placeholder="Temporarily disabled" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="none">Feature under maintenance</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <p className="text-xs text-muted-foreground">🔧 Feature temporarily disabled for stability</p>
+                  </div>
 
                     {/* Zoom In Effect */}
                     <div className="space-y-2">
@@ -369,11 +366,12 @@ export const ScriptEditor: React.FC = () => {
                       <div className="flex items-center space-x-2">
                         <Checkbox 
                           id="zoomIn" 
-                          checked={zoomIn}
-                          onCheckedChange={(checked) => setZoomIn(checked === true)}
+                          checked={false}
+                          onCheckedChange={() => {}}
+                          disabled
                         />
-                        <Label htmlFor="zoomIn" className="text-sm">
-                          Zoom-In Focus
+                        <Label htmlFor="zoomIn" className="text-sm opacity-50">
+                          Zoom-In Focus (Maintenance)
                         </Label>
                       </div>
                     </div>
@@ -384,11 +382,12 @@ export const ScriptEditor: React.FC = () => {
                       <div className="flex items-center space-x-2">
                         <Checkbox 
                           id="spotlightMode" 
-                          checked={spotlightMode}
-                          onCheckedChange={(checked) => setSpotlightMode(checked === true)}
+                          checked={false}
+                          onCheckedChange={() => {}}
+                          disabled
                         />
-                        <Label htmlFor="spotlightMode" className="text-sm">
-                          Display Alone (Spotlight)
+                        <Label htmlFor="spotlightMode" className="text-sm opacity-50">
+                          Display Alone (Spotlight) (Maintenance)
                         </Label>
                       </div>
                     </div>

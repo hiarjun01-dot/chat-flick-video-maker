@@ -30,7 +30,7 @@ export const Steps: React.FC<StepsProps> = ({
           const isLast = index === steps.length - 1;
 
           return (
-            <React.Fragment key={step.id}>
+            <div key={step.id} className="flex items-center">
               <div className="flex flex-col items-center">
                 <div
                   className={cn(
@@ -74,7 +74,7 @@ export const Steps: React.FC<StepsProps> = ({
                   }
                 )} />
               )}
-            </React.Fragment>
+            </div>
           );
         })}
       </div>

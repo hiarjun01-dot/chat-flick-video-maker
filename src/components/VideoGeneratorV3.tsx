@@ -379,26 +379,58 @@ export const VideoGeneratorV3: React.FC = () => {
         ctx.font = `20px ${settings.fontFamily === 'handwriting' ? 'cursive' : settings.fontFamily === 'typewriter' ? 'monospace' : 'system-ui'}`;
         ctx.textAlign = 'left';
         
-        // Word wrap
-        const words = message.text.split(' ');
-        const lines: string[] = [];
-        let currentLine = '';
-        
-        words.forEach(word => {
-          const testLine = currentLine + (currentLine ? ' ' : '') + word;
-          const metrics = ctx.measureText(testLine);
-          if (metrics.width > messageMaxWidth - 40) {
-            lines.push(currentLine);
-            currentLine = word;
-          } else {
-            currentLine = testLine;
+        // Enhanced text rendering with emoji support
+        const renderText = (text: string, x: number, y: number, maxWidth: number) => {
+          // Split text into segments (text and emojis)
+          const segments = text.split(/([\u{1F600}-\u{1F64F}]|[\u{1F300}-\u{1F5FF}]|[\u{1F680}-\u{1F6FF}]|[\u{1F1E0}-\u{1F1FF}]|[\u{2600}-\u{26FF}]|[\u{2700}-\u{27BF}])/u);
+          
+          const lines: Array<{text: string, segments: Array<{content: string, isEmoji: boolean}>}> = [];
+          let currentLine = '';
+          let currentSegments: Array<{content: string, isEmoji: boolean}> = [];
+          
+          // Process each segment
+          const words = text.split(' ');
+          words.forEach((word, wordIndex) => {
+            const testLine = currentLine + (currentLine ? ' ' : '') + word;
+            const metrics = ctx.measureText(testLine);
+            
+            if (metrics.width > maxWidth) {
+              if (currentLine) {
+                lines.push({text: currentLine, segments: [...currentSegments]});
+                currentLine = word;
+                currentSegments = [];
+              } else {
+                currentLine = word;
+              }
+            } else {
+              currentLine = testLine;
+            }
+            
+            // Add segments for this word
+            const wordSegments = word.split(/([\u{1F600}-\u{1F64F}]|[\u{1F300}-\u{1F5FF}]|[\u{1F680}-\u{1F6FF}]|[\u{1F1E0}-\u{1F1FF}]|[\u{2600}-\u{26FF}]|[\u{2700}-\u{27BF}])/u);
+            wordSegments.forEach(segment => {
+              if (segment) {
+                const isEmoji = /[\u{1F600}-\u{1F64F}]|[\u{1F300}-\u{1F5FF}]|[\u{1F680}-\u{1F6FF}]|[\u{1F1E0}-\u{1F1FF}]|[\u{2600}-\u{26FF}]|[\u{2700}-\u{27BF}]/u.test(segment);
+                currentSegments.push({content: segment, isEmoji});
+              }
+            });
+            
+            if (wordIndex < words.length - 1) {
+              currentSegments.push({content: ' ', isEmoji: false});
+            }
+          });
+          
+          if (currentLine) {
+            lines.push({text: currentLine, segments: currentSegments});
           }
-        });
-        if (currentLine) lines.push(currentLine);
 
-        lines.forEach((line, lineIndex) => {
-          ctx.fillText(line, messageX + 20, currentY + 55 + (lineIndex * 25));
-        });
+          // Render each line
+          lines.forEach((line, lineIndex) => {
+            ctx.fillText(line.text, x, y + (lineIndex * 25));
+          });
+        };
+
+        renderText(message.text, messageX + 20, currentY + 55, messageMaxWidth - 40);
       }
 
       // Draw reaction if present
