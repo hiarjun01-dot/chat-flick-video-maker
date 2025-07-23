@@ -175,9 +175,9 @@ export const V6TestScenario: React.FC = () => {
             <h4 className="text-lg font-semibold">Nightmare Scenario Test</h4>
             <AlertTriangle className="w-5 h-5 text-orange-400" />
           </div>
-          
+
           <p className="text-sm text-muted-foreground max-w-md mx-auto">
-            Creates a comprehensive test script that uses <strong>every single V6.0 feature simultaneously</strong> 
+            Creates a comprehensive test script that uses <strong>every single V6.0 feature simultaneously</strong>
             to validate bulletproof stability and perfect feature integration.
           </p>
 
@@ -191,7 +191,7 @@ export const V6TestScenario: React.FC = () => {
             <span className="bg-pink-500/20 text-pink-400 px-2 py-1 rounded">Timestamps</span>
           </div>
 
-          <Button 
+          <Button
             onClick={createNightmareScenario}
             disabled={characters.length < 2}
             className="btn-glow"
