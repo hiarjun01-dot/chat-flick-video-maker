@@ -1,4 +1,4 @@
- import React, { useState } from 'react';
+import React, { useState } from 'react';
 import { Plus, Trash2, GripVertical, Send, Image, Clock, Smile, Upload } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -17,15 +17,15 @@ import { toast } from 'sonner';
 import { V6TestScenario } from './V6TestScenario';
 
 export const ScriptEditor: React.FC = () => {
-  const {
-    characters,
-    messages,
-    addMessage,
-    updateMessage,
-    deleteMessage,
-    markStepCompleted
+  const { 
+    characters, 
+    messages, 
+    addMessage, 
+    updateMessage, 
+    deleteMessage, 
+    markStepCompleted 
   } = useProjectStore();
-
+  
   const [selectedCharacterId, setSelectedCharacterId] = useState<string>('');
   const [messageText, setMessageText] = useState('');
   const [messageDelay, setMessageDelay] = useState('1');
@@ -45,7 +45,7 @@ export const ScriptEditor: React.FC = () => {
       toast.error('Please select a character');
       return;
     }
-
+    
     if (messageType === 'text' && !messageText.trim()) {
       toast.error('Message cannot be empty');
       return;
@@ -82,7 +82,7 @@ export const ScriptEditor: React.FC = () => {
     setZoomIn(false);
     setSpotlightMode(false);
     toast.success('Message added to script');
-
+    
     // Mark step as completed if we have messages
     if (messages.length >= 0) {
       markStepCompleted('script');
@@ -131,7 +131,7 @@ export const ScriptEditor: React.FC = () => {
           <h2 className="text-2xl font-bold text-glow">Script Editor</h2>
           <p className="text-muted-foreground mt-1">Create your chat conversation</p>
         </div>
-
+        
         <Card className="card-glow p-8 text-center">
           <div className="mx-auto w-16 h-16 bg-muted rounded-full flex items-center justify-center mb-4">
             <Send className="w-8 h-8 text-muted-foreground" />
@@ -185,7 +185,7 @@ export const ScriptEditor: React.FC = () => {
                 </SelectContent>
               </Select>
             </div>
-
+            
             <div className="space-y-2">
               <Label>Delay (seconds)</Label>
               <Input
@@ -369,8 +369,8 @@ export const ScriptEditor: React.FC = () => {
                     <div className="space-y-2">
                       <Label>Visual Effects</Label>
                       <div className="flex items-center space-x-2">
-                        <Checkbox
-                          id="zoomIn"
+                        <Checkbox 
+                          id="zoomIn" 
                           checked={zoomIn}
                           onCheckedChange={(checked) => setZoomIn(checked === true)}
                         />
@@ -385,8 +385,8 @@ export const ScriptEditor: React.FC = () => {
                     <div className="space-y-2">
                       <Label>Display Mode</Label>
                       <div className="flex items-center space-x-2">
-                        <Checkbox
-                          id="spotlightMode"
+                        <Checkbox 
+                          id="spotlightMode" 
                           checked={spotlightMode}
                           onCheckedChange={(checked) => setSpotlightMode(checked === true)}
                         />
@@ -407,7 +407,7 @@ export const ScriptEditor: React.FC = () => {
           </div>
 
           {/* Add Message Button */}
-          <Button
+          <Button 
             onClick={handleAddMessage}
             disabled={!selectedCharacterId || (messageType === 'text' && !messageText.trim()) || (messageType === 'image' && !imageFile)}
             className="w-full btn-glow"
@@ -436,7 +436,7 @@ export const ScriptEditor: React.FC = () => {
               <GripVertical className="w-5 h-5" />
               Chat Preview ({messages.length} messages)
             </h3>
-
+            
             {messages.map((message, index) => {
               const character = getCharacterById(message.characterId);
               if (!character) return null;
@@ -450,7 +450,7 @@ export const ScriptEditor: React.FC = () => {
                         {character.name.charAt(0).toUpperCase()}
                       </AvatarFallback>
                     </Avatar>
-
+                    
                     <div className="flex-1 min-w-0 space-y-2">
                       <div className="flex items-center gap-2">
                         <span className="font-semibold text-sm">{character.name}</span>
@@ -489,9 +489,9 @@ export const ScriptEditor: React.FC = () => {
                         <div className="message-received p-3 max-w-sm">
                           {message.imageUrl ? (
                             <div className="space-y-2">
-                              <img
-                                src={message.imageUrl}
-                                alt="Message image"
+                              <img 
+                                src={message.imageUrl} 
+                                alt="Message image" 
                                 className="w-full rounded-lg max-w-48"
                               />
                               <div className="text-sm">{message.text}</div>
@@ -500,7 +500,7 @@ export const ScriptEditor: React.FC = () => {
                             message.text
                           )}
                         </div>
-
+                        
                         {/* V6.0 Enhanced Reaction Overlay */}
                         {message.reaction && (
                           <div className="reaction-overlay bg-background/90 rounded-full p-1.5 border border-border shadow-lg">
@@ -528,7 +528,7 @@ export const ScriptEditor: React.FC = () => {
                         )}
                       </div>
                     </div>
-
+                    
                     <div className="flex flex-col gap-1">
                       <Button
                         size="sm"
@@ -544,15 +544,13 @@ export const ScriptEditor: React.FC = () => {
             })}
           </div>
         )}
-
+        
         {messages.length > 0 && (
           <div className="text-center text-sm text-muted-foreground">
             Total conversation length: {messages.reduce((acc, msg) => acc + (msg.delay || 1), 0).toFixed(1)} seconds
           </div>
         )}
       </div>
-
-      <V6TestScenario />
     </div>
   );
-};
+}; 
