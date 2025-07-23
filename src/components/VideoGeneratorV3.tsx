@@ -47,6 +47,36 @@ export const VideoGeneratorV3: React.FC = () => {
     return characters.find(char => char.id === id);
   };
 
+  // Enhanced color utility functions - inspired by Python pipeline
+  const adjustColorBrightness = (color: string, amount: number): string => {
+    // Convert hex to RGB if needed
+    let r, g, b;
+    if (color.startsWith('#')) {
+      const hex = color.substring(1);
+      r = parseInt(hex.substring(0, 2), 16);
+      g = parseInt(hex.substring(2, 4), 16);
+      b = parseInt(hex.substring(4, 6), 16);
+    } else if (color.startsWith('rgb')) {
+      const matches = color.match(/\d+/g);
+      if (matches) {
+        r = parseInt(matches[0]);
+        g = parseInt(matches[1]);
+        b = parseInt(matches[2]);
+      } else {
+        return color;
+      }
+    } else {
+      return color;
+    }
+    
+    // Adjust brightness
+    r = Math.max(0, Math.min(255, r + amount));
+    g = Math.max(0, Math.min(255, g + amount));
+    b = Math.max(0, Math.min(255, b + amount));
+    
+    return `rgb(${r}, ${g}, ${b})`;
+  };
+
   // Preload all assets
   const preloadAssets = async (): Promise<{[key: string]: HTMLImageElement}> => {
     const assets: {[key: string]: HTMLImageElement} = {};
@@ -306,29 +336,64 @@ export const VideoGeneratorV3: React.FC = () => {
       const avatarSize = 60;
       const avatarX = isEven ? messageX - 80 : messageX + messageMaxWidth + 20;
       
-      // Use loaded avatar image or fallback to color circle
+      // Enhanced circular avatar rendering - inspired by Python pipeline
       const avatarImg = loadedAssets[`avatar_${character.id}`];
       if (avatarImg) {
         ctx.save();
+        // Create perfect circular clipping path
         ctx.beginPath();
         ctx.arc(avatarX + avatarSize/2, currentY + 30, avatarSize/2, 0, 2 * Math.PI);
         ctx.clip();
-        ctx.drawImage(avatarImg, avatarX, currentY, avatarSize, avatarSize);
+        
+        // Draw avatar with proper scaling to maintain aspect ratio
+        const aspectRatio = avatarImg.width / avatarImg.height;
+        let drawWidth = avatarSize;
+        let drawHeight = avatarSize;
+        let drawX = avatarX;
+        let drawY = currentY;
+        
+        if (aspectRatio > 1) {
+          // Image is wider than tall
+          drawHeight = avatarSize / aspectRatio;
+          drawY = currentY + (avatarSize - drawHeight) / 2;
+        } else if (aspectRatio < 1) {
+          // Image is taller than wide
+          drawWidth = avatarSize * aspectRatio;
+          drawX = avatarX + (avatarSize - drawWidth) / 2;
+        }
+        
+        ctx.drawImage(avatarImg, drawX, drawY, drawWidth, drawHeight);
         ctx.restore();
+        
+        // Add subtle border for better definition
+        ctx.strokeStyle = settings.theme === 'dark' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.arc(avatarX + avatarSize/2, currentY + 30, avatarSize/2, 0, 2 * Math.PI);
+        ctx.stroke();
       } else {
-        ctx.fillStyle = character.color;
+        // Enhanced fallback avatar with gradient
+        const gradient = ctx.createRadialGradient(
+          avatarX + avatarSize/2, currentY + 30, 0,
+          avatarX + avatarSize/2, currentY + 30, avatarSize/2
+        );
+        gradient.addColorStop(0, character.color);
+        gradient.addColorStop(1, adjustColorBrightness(character.color, -20));
+        
+        ctx.fillStyle = gradient;
         ctx.beginPath();
         ctx.arc(avatarX + avatarSize/2, currentY + 30, avatarSize/2, 0, 2 * Math.PI);
         ctx.fill();
         
-        // Character initial
+        // Character initial with better typography
         ctx.fillStyle = '#ffffff';
         ctx.font = `bold 24px ${settings.fontFamily === 'handwriting' ? 'cursive' : settings.fontFamily === 'typewriter' ? 'monospace' : 'system-ui'}`;
         ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
         ctx.fillText(
           character.name.charAt(0).toUpperCase(),
           avatarX + avatarSize/2,
-          currentY + 40
+          currentY + 30
         );
       }
 
@@ -383,54 +448,64 @@ export const VideoGeneratorV3: React.FC = () => {
         ctx.font = `20px ${settings.fontFamily === 'handwriting' ? 'cursive' : settings.fontFamily === 'typewriter' ? 'monospace' : 'system-ui'}`;
         ctx.textAlign = 'left';
         
-        // Enhanced text rendering with emoji support
+        // Enhanced text rendering with proper emoji integration - inspired by Python Pilmoji
         const renderText = (text: string, x: number, y: number, maxWidth: number) => {
-          // Split text into segments (text and emojis)
-          const segments = text.split(/([\u{1F600}-\u{1F64F}]|[\u{1F300}-\u{1F5FF}]|[\u{1F680}-\u{1F6FF}]|[\u{1F1E0}-\u{1F1FF}]|[\u{2600}-\u{26FF}]|[\u{2700}-\u{27BF}])/u);
+          // Enhanced emoji detection covering all Unicode emoji ranges
+          const emojiRegex = /([\u{1F600}-\u{1F64F}]|[\u{1F300}-\u{1F5FF}]|[\u{1F680}-\u{1F6FF}]|[\u{1F1E0}-\u{1F1FF}]|[\u{2600}-\u{26FF}]|[\u{2700}-\u{27BF}]|[\u{1F900}-\u{1F9FF}]|[\u{1FA70}-\u{1FAFF}]|[\u{1F004}]|[\u{1F0CF}]|[\u{1F18E}]|[\u{3030}]|[\u{2B50}]|[\u{2B55}]|[\u{2934}-\u{2935}]|[\u{2B05}-\u{2B07}]|[\u{2B1B}-\u{2B1C}]|[\u{3297}]|[\u{3299}]|[\u{303D}]|[\u{00A9}]|[\u{00AE}]|[\u{2122}]|[\u{23F3}]|[\u{24C2}]|[\u{23E9}-\u{23EF}]|[\u{25B6}]|[\u{23F8}-\u{23FA}])/gu;
           
-          const lines: Array<{text: string, segments: Array<{content: string, isEmoji: boolean}>}> = [];
+          const lines: string[] = [];
           let currentLine = '';
-          let currentSegments: Array<{content: string, isEmoji: boolean}> = [];
           
-          // Process each segment
+          // Split text into words for better line wrapping
           const words = text.split(' ');
+          
           words.forEach((word, wordIndex) => {
             const testLine = currentLine + (currentLine ? ' ' : '') + word;
             const metrics = ctx.measureText(testLine);
             
-            if (metrics.width > maxWidth) {
-              if (currentLine) {
-                lines.push({text: currentLine, segments: [...currentSegments]});
-                currentLine = word;
-                currentSegments = [];
-              } else {
-                currentLine = word;
-              }
+            if (metrics.width > maxWidth && currentLine) {
+              lines.push(currentLine);
+              currentLine = word;
             } else {
               currentLine = testLine;
-            }
-            
-            // Add segments for this word
-            const wordSegments = word.split(/([\u{1F600}-\u{1F64F}]|[\u{1F300}-\u{1F5FF}]|[\u{1F680}-\u{1F6FF}]|[\u{1F1E0}-\u{1F1FF}]|[\u{2600}-\u{26FF}]|[\u{2700}-\u{27BF}])/u);
-            wordSegments.forEach(segment => {
-              if (segment) {
-                const isEmoji = /[\u{1F600}-\u{1F64F}]|[\u{1F300}-\u{1F5FF}]|[\u{1F680}-\u{1F6FF}]|[\u{1F1E0}-\u{1F1FF}]|[\u{2600}-\u{26FF}]|[\u{2700}-\u{27BF}]/u.test(segment);
-                currentSegments.push({content: segment, isEmoji});
-              }
-            });
-            
-            if (wordIndex < words.length - 1) {
-              currentSegments.push({content: ' ', isEmoji: false});
             }
           });
           
           if (currentLine) {
-            lines.push({text: currentLine, segments: currentSegments});
+            lines.push(currentLine);
           }
 
-          // Render each line
+          // Render each line with enhanced emoji handling
           lines.forEach((line, lineIndex) => {
-            ctx.fillText(line.text, x, y + (lineIndex * 25));
+            const lineY = y + (lineIndex * 28); // Increased line spacing for better readability
+            
+            // Split line into text and emoji segments
+            const segments = line.split(emojiRegex);
+            const matches = [...line.matchAll(emojiRegex)];
+            
+            let currentX = x;
+            let segmentIndex = 0;
+            let matchIndex = 0;
+            
+            segments.forEach((segment, i) => {
+              if (segment) {
+                // Regular text
+                ctx.fillText(segment, currentX, lineY);
+                currentX += ctx.measureText(segment).width;
+              }
+              
+              // Add emoji if there's a match at this position
+              if (matchIndex < matches.length) {
+                const emoji = matches[matchIndex][0];
+                // Enhanced emoji rendering with proper sizing and positioning
+                const originalFont = ctx.font;
+                ctx.font = `22px "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", system-ui`;
+                ctx.fillText(emoji, currentX, lineY);
+                currentX += ctx.measureText(emoji).width;
+                ctx.font = originalFont;
+                matchIndex++;
+              }
+            });
           });
         };
 
