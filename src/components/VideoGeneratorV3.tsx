@@ -36,7 +36,7 @@ export const VideoGeneratorV3: React.FC = () => {
   const [animationFrames, setAnimationFrames] = useState<AnimationFrame[]>([]);
   const [currentFrame, setCurrentFrame] = useState(0);
   const [loadedAssets, setLoadedAssets] = useState<{[key: string]: HTMLImageElement}>({});
-  
+
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const animationRef = useRef<NodeJS.Timeout>();
@@ -68,12 +68,12 @@ export const VideoGeneratorV3: React.FC = () => {
     } else {
       return color;
     }
-    
+
     // Adjust brightness
     r = Math.max(0, Math.min(255, r + amount));
     g = Math.max(0, Math.min(255, g + amount));
     b = Math.max(0, Math.min(255, b + amount));
-    
+
     return `rgb(${r}, ${g}, ${b})`;
   };
 
@@ -168,15 +168,8 @@ export const VideoGeneratorV3: React.FC = () => {
       audioContextRef.current = new (window.AudioContext || (window as any).webkitAudioContext)();
     }
 
-    const soundUrls = {
-      ping: 'data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmseAk+P2fPTdygAIG/K8uKVPwcOUpjo8bFmHAU1lM3z1nkqAyu3/jbDgCGg',
-      swoosh: 'data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmseAk+P2fPTdygAIG/K8uKVPwcOUpjo8bFmHAU1lM3z1nkqAyu3/jbDgCGg',
-      error: 'data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmseAk+P2fPTdygAIG/K8uKVPwcOUpjo8bFmHAU1lM3z1nkqAyu3/jbDgCGg',
-      gasp: 'data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmseAk+P2fPTdygAIG/K8uKVPwcOUpjo8bFmHAU1lM3z1nkqAyu3/jbDgCGg'
-    };
-
-    // Note: In a real implementation, you'd load actual sound files
-    // For demo purposes, we'll simulate sound loading
+    // In a real app, you would fetch and decode actual audio files.
+    // This is a placeholder for the logic.
   };
 
   // Generate enhanced animation frames with V3.1 effects
@@ -272,7 +265,7 @@ export const VideoGeneratorV3: React.FC = () => {
     // Set canvas size based on resolution setting
     const width = settings.resolution === '1080p' ? 1080 : 1280;
     const height = settings.resolution === '1080p' ? 1920 : 720;
-    
+
     canvas.width = width;
     canvas.height = height;
 
@@ -282,382 +275,85 @@ export const VideoGeneratorV3: React.FC = () => {
     ctx.translate(offsetX, offsetY);
 
     // Clear canvas with background
-    if (settings.chatBackgroundColor) {
-      ctx.fillStyle = settings.chatBackgroundColor;
-    } else {
-      ctx.fillStyle = settings.theme === 'dark' ? '#1a1a1a' : '#ffffff';
-    }
+    ctx.fillStyle = '#313338'; // Discord-like background
     ctx.fillRect(0, 0, width, height);
 
-    // Draw background image if available
-    if (loadedAssets['background']) {
-      ctx.globalAlpha = 0.3;
-      ctx.drawImage(loadedAssets['background'], 0, 0, width, height);
-      ctx.globalAlpha = 1.0;
-    }
-
-    // Draw chat header
-    const headerHeight = 120;
-    ctx.fillStyle = settings.theme === 'dark' ? '#2a2a2a' : '#f5f5f5';
-    ctx.fillRect(0, 0, width, headerHeight);
-
-    // Header text
-    ctx.fillStyle = settings.theme === 'dark' ? '#ffffff' : '#000000';
-    ctx.font = `bold 36px ${settings.fontFamily === 'handwriting' ? 'cursive' : settings.fontFamily === 'typewriter' ? 'monospace' : 'system-ui'}`;
-    ctx.textAlign = 'center';
-    ctx.fillText('Chat Story', width / 2, 70);
 
     // Draw messages
-    const messageStartY = headerHeight + 40;
-    let currentY = messageStartY;
-    const messageSpacing = 100;
-    const messageMaxWidth = width - 160;
+    let currentY = height - 50; // Start from bottom
+    const messageSpacing = 15;
+    const leftMargin = 80;
 
-    // V6.0 Enhanced Spotlight filtering with improved stability
-    const messagesToShow = frame.spotlightMessage 
+    const messagesToShow = frame.spotlightMessage
       ? frame.messages.filter(msg => msg.id === frame.spotlightMessage)
       : frame.messages;
 
-    messagesToShow.forEach((message, index) => {
+    messagesToShow.slice().reverse().forEach((message) => {
       const character = getCharacterById(message.characterId);
       if (!character) return;
 
-      const isEven = index % 2 === 0;
-      const messageX = isEven ? 80 : width - messageMaxWidth - 80;
+      ctx.font = '16px sans-serif';
+      const lines: string[] = [];
+      const words = message.text.split(' ');
+      let currentLine = '';
 
-      // Highlight if this is the zoom target
-      const isZoomTarget = frame.zoomTarget === message.id;
-      if (isZoomTarget) {
-        ctx.shadowColor = '#007AFF';
-        ctx.shadowBlur = 20;
+      for(const word of words) {
+        const testLine = currentLine.length > 0 ? currentLine + ' ' + word : word;
+        const metrics = ctx.measureText(testLine);
+        if (metrics.width > width - leftMargin - 40 && currentLine.length > 0) {
+          lines.push(currentLine);
+          currentLine = word;
+        } else {
+          currentLine = testLine;
+        }
       }
+      lines.push(currentLine);
+
+
+      const bubbleHeight = (lines.length * 22) + (lines.length > 1 ? 10 : 20);
+      const bubbleY = currentY - bubbleHeight;
 
       // Draw avatar
-      const avatarSize = 60;
-      const avatarX = isEven ? messageX - 80 : messageX + messageMaxWidth + 20;
-      
-      // Enhanced circular avatar rendering - inspired by Python pipeline
+      const avatarSize = 50;
+      const avatarX = 15;
+      const avatarY = bubbleY;
       const avatarImg = loadedAssets[`avatar_${character.id}`];
-      if (avatarImg) {
-        ctx.save();
-        // Create perfect circular clipping path
-        ctx.beginPath();
-        ctx.arc(avatarX + avatarSize/2, currentY + 30, avatarSize/2, 0, 2 * Math.PI);
-        ctx.clip();
-        
-        // Draw avatar with proper scaling to maintain aspect ratio
-        const aspectRatio = avatarImg.width / avatarImg.height;
-        let drawWidth = avatarSize;
-        let drawHeight = avatarSize;
-        let drawX = avatarX;
-        let drawY = currentY;
-        
-        if (aspectRatio > 1) {
-          // Image is wider than tall
-          drawHeight = avatarSize / aspectRatio;
-          drawY = currentY + (avatarSize - drawHeight) / 2;
-        } else if (aspectRatio < 1) {
-          // Image is taller than wide
-          drawWidth = avatarSize * aspectRatio;
-          drawX = avatarX + (avatarSize - drawWidth) / 2;
-        }
-        
-        ctx.drawImage(avatarImg, drawX, drawY, drawWidth, drawHeight);
-        ctx.restore();
-        
-        // Add subtle border for better definition
-        ctx.strokeStyle = settings.theme === 'dark' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)';
-        ctx.lineWidth = 2;
-        ctx.beginPath();
-        ctx.arc(avatarX + avatarSize/2, currentY + 30, avatarSize/2, 0, 2 * Math.PI);
-        ctx.stroke();
-      } else {
-        // Enhanced fallback avatar with gradient
-        const gradient = ctx.createRadialGradient(
-          avatarX + avatarSize/2, currentY + 30, 0,
-          avatarX + avatarSize/2, currentY + 30, avatarSize/2
-        );
-        gradient.addColorStop(0, character.color);
-        gradient.addColorStop(1, adjustColorBrightness(character.color, -20));
-        
-        ctx.fillStyle = gradient;
-        ctx.beginPath();
-        ctx.arc(avatarX + avatarSize/2, currentY + 30, avatarSize/2, 0, 2 * Math.PI);
-        ctx.fill();
-        
-        // Character initial with better typography
-        ctx.fillStyle = '#ffffff';
-        ctx.font = `bold 24px ${settings.fontFamily === 'handwriting' ? 'cursive' : settings.fontFamily === 'typewriter' ? 'monospace' : 'system-ui'}`;
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'middle';
-        ctx.fillText(
-          character.name.charAt(0).toUpperCase(),
-          avatarX + avatarSize/2,
-          currentY + 30
-        );
-      }
 
-      // Character name
-      ctx.shadowBlur = 0;
-      ctx.fillStyle = settings.theme === 'dark' ? '#ffffff' : '#000000';
-      ctx.font = `18px ${settings.fontFamily === 'handwriting' ? 'cursive' : settings.fontFamily === 'typewriter' ? 'monospace' : 'system-ui'}`;
-      ctx.textAlign = isEven ? 'left' : 'right';
-      ctx.fillText(
-        character.name,
-        isEven ? messageX : messageX + messageMaxWidth,
-        currentY + 15
-      );
-
-      // Message bubble
-      const bubbleHeight = message.imageUrl ? 200 : 80;
-      const bubbleRadius = 20;
-      
-      // Use custom colors if set
-      let bubbleColor;
-      if (isEven) {
-        bubbleColor = settings.senderBubbleColor || '#007AFF';
-      } else {
-        bubbleColor = settings.receiverBubbleColor || (settings.theme === 'dark' ? '#3a3a3a' : '#e5e5ea');
-      }
-      
-      ctx.fillStyle = bubbleColor;
-      
-      // Draw rounded rectangle
+      ctx.save();
       ctx.beginPath();
-      ctx.roundRect(messageX, currentY + 25, messageMaxWidth, bubbleHeight, bubbleRadius);
-      ctx.fill();
-
-      // Message content
-      if (message.imageUrl && loadedAssets[`message_${message.id}`]) {
-        // Draw image message
-        const img = loadedAssets[`message_${message.id}`];
-        const imgWidth = messageMaxWidth - 20;
-        const imgHeight = 160;
-        ctx.drawImage(img, messageX + 10, currentY + 35, imgWidth, imgHeight);
-        
-        // Add text below image if any
-        if (message.text) {
-          ctx.fillStyle = isEven ? '#ffffff' : (settings.theme === 'dark' ? '#ffffff' : '#000000');
-          ctx.font = `16px ${settings.fontFamily === 'handwriting' ? 'cursive' : settings.fontFamily === 'typewriter' ? 'monospace' : 'system-ui'}`;
-          ctx.textAlign = 'left';
-          ctx.fillText(message.text, messageX + 20, currentY + 215);
-        }
+      ctx.arc(avatarX + avatarSize / 2, avatarY + avatarSize / 2, avatarSize / 2, 0, Math.PI * 2, true);
+      ctx.clip();
+      if (avatarImg) {
+        ctx.drawImage(avatarImg, avatarX, avatarY, avatarSize, avatarSize);
       } else {
-        // Draw text message
-        ctx.fillStyle = isEven ? '#ffffff' : (settings.theme === 'dark' ? '#ffffff' : '#000000');
-        ctx.font = `20px ${settings.fontFamily === 'handwriting' ? 'cursive' : settings.fontFamily === 'typewriter' ? 'monospace' : 'system-ui'}`;
-        ctx.textAlign = 'left';
-        
-        // Enhanced text rendering with proper emoji integration - inspired by Python Pilmoji
-        const renderText = (text: string, x: number, y: number, maxWidth: number) => {
-          // Enhanced emoji detection covering all Unicode emoji ranges
-          const emojiRegex = /([\u{1F600}-\u{1F64F}]|[\u{1F300}-\u{1F5FF}]|[\u{1F680}-\u{1F6FF}]|[\u{1F1E0}-\u{1F1FF}]|[\u{2600}-\u{26FF}]|[\u{2700}-\u{27BF}]|[\u{1F900}-\u{1F9FF}]|[\u{1FA70}-\u{1FAFF}]|[\u{1F004}]|[\u{1F0CF}]|[\u{1F18E}]|[\u{3030}]|[\u{2B50}]|[\u{2B55}]|[\u{2934}-\u{2935}]|[\u{2B05}-\u{2B07}]|[\u{2B1B}-\u{2B1C}]|[\u{3297}]|[\u{3299}]|[\u{303D}]|[\u{00A9}]|[\u{00AE}]|[\u{2122}]|[\u{23F3}]|[\u{24C2}]|[\u{23E9}-\u{23EF}]|[\u{25B6}]|[\u{23F8}-\u{23FA}])/gu;
-          
-          const lines: string[] = [];
-          let currentLine = '';
-          
-          // Split text into words for better line wrapping
-          const words = text.split(' ');
-          
-          words.forEach((word, wordIndex) => {
-            const testLine = currentLine + (currentLine ? ' ' : '') + word;
-            const metrics = ctx.measureText(testLine);
-            
-            if (metrics.width > maxWidth && currentLine) {
-              lines.push(currentLine);
-              currentLine = word;
-            } else {
-              currentLine = testLine;
-            }
-          });
-          
-          if (currentLine) {
-            lines.push(currentLine);
-          }
-
-          // Render each line with enhanced emoji handling
-          lines.forEach((line, lineIndex) => {
-            const lineY = y + (lineIndex * 28); // Increased line spacing for better readability
-            
-            // Split line into text and emoji segments
-            const segments = line.split(emojiRegex);
-            const matches = [...line.matchAll(emojiRegex)];
-            
-            let currentX = x;
-            let segmentIndex = 0;
-            let matchIndex = 0;
-            
-            segments.forEach((segment, i) => {
-              if (segment) {
-                // Regular text
-                ctx.fillText(segment, currentX, lineY);
-                currentX += ctx.measureText(segment).width;
-              }
-              
-              // Add emoji if there's a match at this position
-              if (matchIndex < matches.length) {
-                const emoji = matches[matchIndex][0];
-                // Enhanced emoji rendering with proper sizing and positioning
-                const originalFont = ctx.font;
-                ctx.font = `22px "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", system-ui`;
-                ctx.fillText(emoji, currentX, lineY);
-                currentX += ctx.measureText(emoji).width;
-                ctx.font = originalFont;
-                matchIndex++;
-              }
-            });
-          });
-        };
-
-        renderText(message.text, messageX + 20, currentY + 55, messageMaxWidth - 40);
+        ctx.fillStyle = character.color;
+        ctx.fillRect(avatarX, avatarY, avatarSize, avatarSize);
       }
+      ctx.restore();
 
-      // V6.0 Enhanced Reaction Overlay - draws on the message bubble corner
-      if (message.reaction) {
-        const reactionSize = 28;
-        const reactionX = isEven ? messageX + messageMaxWidth - reactionSize - 5 : messageX + 5;
-        const reactionY = currentY + bubbleHeight - reactionSize - 5;
-        
-        // Draw reaction background circle
-        ctx.fillStyle = settings.theme === 'dark' ? 'rgba(42, 42, 42, 0.95)' : 'rgba(255, 255, 255, 0.95)';
-        ctx.beginPath();
-        ctx.arc(reactionX + reactionSize/2, reactionY + reactionSize/2, reactionSize/2, 0, 2 * Math.PI);
-        ctx.fill();
-        
-        // Draw border
-        ctx.strokeStyle = settings.theme === 'dark' ? 'rgba(255, 255, 255, 0.2)' : 'rgba(0, 0, 0, 0.1)';
-        ctx.lineWidth = 1;
-        ctx.stroke();
-        
-        // Draw reaction emoji
-        ctx.font = '18px system-ui';
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'middle';
-        ctx.fillStyle = settings.theme === 'dark' ? '#ffffff' : '#000000';
-        ctx.fillText(message.reaction, reactionX + reactionSize/2, reactionY + reactionSize/2);
-      }
 
-      // Draw timestamp if enabled
-      if (message.showTimestamp) {
-        ctx.fillStyle = '#888888';
-        ctx.font = '14px system-ui';
-        ctx.textAlign = isEven ? 'left' : 'right';
-        const time = new Date(message.timestamp * 1000).toLocaleTimeString('en-US', {
-          hour: 'numeric',
-          minute: '2-digit',
-          hour12: true
-        });
-        ctx.fillText(
-          time,
-          isEven ? messageX : messageX + messageMaxWidth,
-          currentY + bubbleHeight + 45
-        );
-      }
+      // Draw username and timestamp
+      ctx.fillStyle = character.color;
+      ctx.font = 'bold 16px sans-serif';
+      ctx.textAlign = 'left';
+      ctx.fillText(character.name, leftMargin, bubbleY + 18);
 
-      ctx.shadowBlur = 0;
-      currentY += bubbleHeight + messageSpacing;
+      ctx.fillStyle = '#949BA4'; // Timestamp color
+      ctx.font = '12px sans-serif';
+      const time = new Date(message.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      ctx.fillText(time, leftMargin + ctx.measureText(character.name).width + 10, bubbleY + 18);
+
+
+      // Draw message text
+      ctx.fillStyle = '#DBDEE1'; // Message text color
+      ctx.font = '16px sans-serif';
+      lines.forEach((line, index) => {
+          ctx.fillText(line, leftMargin, bubbleY + 40 + (index * 22));
+      });
+
+      currentY -= (bubbleHeight + messageSpacing);
     });
 
-    // V6.0 Enhanced 3D Typing Indicator
-    if (frame.isTyping && frame.typingCharacterId) {
-      const character = getCharacterById(frame.typingCharacterId);
-      if (character) {
-        const typingX = 80;
-        const typingY = currentY;
-        const bubbleWidth = 120;
-        const bubbleHeight = 50;
-        
-        // Enhanced typing bubble with gradient
-        const gradient = ctx.createLinearGradient(typingX, typingY, typingX, typingY + bubbleHeight);
-        gradient.addColorStop(0, settings.theme === 'dark' ? 'rgba(60, 60, 60, 0.95)' : 'rgba(230, 230, 230, 0.95)');
-        gradient.addColorStop(1, settings.theme === 'dark' ? 'rgba(40, 40, 40, 0.95)' : 'rgba(200, 200, 200, 0.95)');
-        
-        ctx.fillStyle = gradient;
-        ctx.beginPath();
-        ctx.roundRect(typingX, typingY, bubbleWidth, bubbleHeight, 25);
-        ctx.fill();
-        
-        // Enhanced border with glow
-        ctx.strokeStyle = settings.theme === 'dark' ? 'rgba(100, 100, 100, 0.3)' : 'rgba(150, 150, 150, 0.3)';
-        ctx.lineWidth = 1;
-        ctx.stroke();
-        
-        // V6.0 3D Animated Dots with enhanced visual effects
-        const dotSize = 6;
-        const dotSpacing = 12;
-        const dotsStartX = typingX + (bubbleWidth - (dotSpacing * 2)) / 2;
-        const dotsY = typingY + bubbleHeight / 2;
-        const time = Date.now() / 300; // Animation timing
-        
-        for (let i = 0; i < 3; i++) {
-          const dotX = dotsStartX + (i * dotSpacing);
-          const animationPhase = time + i * 0.5;
-          const bounce = Math.abs(Math.sin(animationPhase)) * 4;
-          const scale = 1 + Math.abs(Math.sin(animationPhase)) * 0.3;
-          const glow = Math.abs(Math.sin(animationPhase)) * 0.5;
-          
-          // Create 3D effect with multiple layers
-          const baseColor = settings.theme === 'dark' ? '#007AFF' : '#007AFF';
-          const glowColor = settings.theme === 'dark' ? 'rgba(0, 122, 255, 0.6)' : 'rgba(0, 122, 255, 0.4)';
-          
-          // Glow layer
-          ctx.fillStyle = glowColor;
-          ctx.beginPath();
-          ctx.arc(dotX, dotsY - bounce, (dotSize + 2) * scale, 0, 2 * Math.PI);
-          ctx.fill();
-          
-          // Main dot with gradient for 3D effect
-          const dotGradient = ctx.createRadialGradient(
-            dotX - dotSize/3, dotsY - bounce - dotSize/3, 0,
-            dotX, dotsY - bounce, dotSize * scale
-          );
-          dotGradient.addColorStop(0, 'rgba(255, 255, 255, 0.6)');
-          dotGradient.addColorStop(0.7, baseColor);
-          dotGradient.addColorStop(1, 'rgba(0, 0, 0, 0.3)');
-          
-          ctx.fillStyle = dotGradient;
-          ctx.beginPath();
-          ctx.arc(dotX, dotsY - bounce, dotSize * scale, 0, 2 * Math.PI);
-          ctx.fill();
-        }
-        
-        // Character name
-        ctx.fillStyle = settings.theme === 'dark' ? '#ffffff' : '#000000';
-        ctx.font = '12px system-ui';
-        ctx.textAlign = 'center';
-        ctx.fillText(`${character.name} is typing...`, typingX + bubbleWidth/2, typingY + bubbleHeight + 15);
-      }
-    }
-
-    // Draw watermark if present
-    if (loadedAssets['watermark']) {
-      const watermarkSize = 80;
-      let watermarkX, watermarkY;
-      
-      switch (settings.watermarkPosition) {
-        case 'top-left':
-          watermarkX = 20;
-          watermarkY = 20;
-          break;
-        case 'top-right':
-          watermarkX = width - watermarkSize - 20;
-          watermarkY = 20;
-          break;
-        case 'bottom-left':
-          watermarkX = 20;
-          watermarkY = height - watermarkSize - 20;
-          break;
-        case 'bottom-right':
-        default:
-          watermarkX = width - watermarkSize - 20;
-          watermarkY = height - watermarkSize - 20;
-          break;
-      }
-      
-      ctx.globalAlpha = 0.7;
-      ctx.drawImage(loadedAssets['watermark'], watermarkX, watermarkY, watermarkSize, watermarkSize);
-      ctx.globalAlpha = 1.0;
-    }
 
     ctx.restore();
   };
@@ -665,16 +361,16 @@ export const VideoGeneratorV3: React.FC = () => {
   // V6.0 Enhanced Sound Effects with improved stability
   const playSoundEffect = (effect: string) => {
     if (!audioContextRef.current) return;
-    
+
     try {
       // Create enhanced sound synthesis for different effects
       const ctx = audioContextRef.current;
       const oscillator = ctx.createOscillator();
       const gainNode = ctx.createGain();
-      
+
       oscillator.connect(gainNode);
       gainNode.connect(ctx.destination);
-      
+
       // Configure different sound effects
       switch (effect) {
         case 'ping':
@@ -705,7 +401,7 @@ export const VideoGeneratorV3: React.FC = () => {
         default:
           return;
       }
-      
+
       oscillator.start(ctx.currentTime);
       oscillator.stop(ctx.currentTime + 0.3);
     } catch (error) {
@@ -717,7 +413,7 @@ export const VideoGeneratorV3: React.FC = () => {
     try {
       const assets = await preloadAssets();
       setLoadedAssets(assets);
-      
+
       const frames = generateFrames();
       setAnimationFrames(frames);
       setCurrentFrame(0);
@@ -730,27 +426,27 @@ export const VideoGeneratorV3: React.FC = () => {
       const animate = () => {
         if (frameIndex < frames.length) {
           const frame = frames[frameIndex];
-          
+
           // V6.0 Enhanced Zoom effects with improved stability
           let scale = 1;
           let offsetX = 0;
           let offsetY = 0;
-          
+
           if (frame.zoomTarget) {
             scale = 1.4; // Slightly reduced for better stability
             offsetX = -150; // Adjusted for better framing
             offsetY = -200;
           }
-          
+
           drawFrame(frame, scale, offsetX, offsetY);
           setCurrentFrame(frameIndex);
-          
+
           // V6.0 Enhanced Sound effects with improved stability
           if (frameIndex > 0) {
             const prevFrame = frames[frameIndex - 1];
             const currentMessages = frame.messages;
             const prevMessages = prevFrame.messages;
-            
+
             // Find new messages and play their sound effects
             currentMessages.forEach(msg => {
               if (!prevMessages.find(pm => pm.id === msg.id) && msg.soundEffect && msg.soundEffect !== 'none') {
@@ -758,7 +454,7 @@ export const VideoGeneratorV3: React.FC = () => {
               }
             });
           }
-          
+
           frameIndex++;
           animationRef.current = setTimeout(animate, frameDuration);
         } else {
@@ -793,17 +489,17 @@ export const VideoGeneratorV3: React.FC = () => {
       toast.info('Loading assets...');
       const assets = await preloadAssets();
       setLoadedAssets(assets);
-      
+
       const canvas = canvasRef.current;
       if (!canvas) throw new Error('Canvas not found');
 
       // Setup recording
       const stream = canvas.captureStream(30);
-      const options = { 
+      const options = {
         mimeType: 'video/webm;codecs=vp9',
         videoBitsPerSecond: settings.resolution === '1080p' ? 5000000 : 2500000
       };
-      
+
       if (!MediaRecorder.isTypeSupported(options.mimeType)) {
         options.mimeType = 'video/webm';
       }
@@ -830,27 +526,27 @@ export const VideoGeneratorV3: React.FC = () => {
       // Generate frames and animate
       toast.info('Generating video frames...');
       const frames = generateFrames();
-      
-      const speedMultiplier = settings.animationSpeed === 'fast' ? 0.5 : 
+
+      const speedMultiplier = settings.animationSpeed === 'fast' ? 0.5 :
                              settings.animationSpeed === 'slow' ? 2 : 1;
-      
+
       for (let i = 0; i < frames.length; i++) {
         const frame = frames[i];
-        
+
         // V6.0 Enhanced Zoom effects with improved stability
         let scale = 1;
         let offsetX = 0;
         let offsetY = 0;
-        
+
         if (frame.zoomTarget) {
           scale = 1.4; // Consistent with preview
           offsetX = -150;
           offsetY = -200;
         }
-        
+
         drawFrame(frame, scale, offsetX, offsetY);
         setGenerationProgress((i / frames.length) * 100);
-        
+
         // Wait for frame duration based on animation speed
         const frameDelay = (frame.time - (frames[i-1]?.time || 0)) * 1000 * speedMultiplier;
         await new Promise(resolve => setTimeout(resolve, Math.max(100, frameDelay)));
@@ -927,16 +623,16 @@ export const VideoGeneratorV3: React.FC = () => {
           <span className="text-sm text-muted-foreground">V6.0 Professional Effects</span>
           <span className="text-xs bg-gradient-to-r from-green-500/20 to-blue-500/20 text-green-400 px-2 py-1 rounded">Stable</span>
         </div>
-        
+
         <div className="flex flex-col items-center space-y-4">
           <canvas
             ref={canvasRef}
             className="border border-border rounded-lg max-w-full h-auto"
             style={{ maxHeight: '400px', aspectRatio: settings.resolution === '1080p' ? '9/16' : '16/9' }}
           />
-          
+
           <div className="flex gap-2">
-            <Button 
+            <Button
               onClick={startAnimation}
               disabled={isPlaying || totalMessages === 0}
               variant="outline"
@@ -944,7 +640,7 @@ export const VideoGeneratorV3: React.FC = () => {
               <Play className="w-4 h-4 mr-2" />
               Preview Effects
             </Button>
-            
+
             <Button
               onClick={generateVideo}
               disabled={isGenerating || totalMessages === 0}
@@ -982,7 +678,7 @@ export const VideoGeneratorV3: React.FC = () => {
             <Download className="w-5 h-5 text-primary" />
             <h3 className="text-lg font-semibold">Generated Video - V6.0</h3>
           </div>
-          
+
           <div className="space-y-4">
             <video
               src={videoUrl}
@@ -992,7 +688,7 @@ export const VideoGeneratorV3: React.FC = () => {
             >
               Your browser does not support the video tag.
             </video>
-            
+
             <div className="text-center">
               <Button onClick={downloadVideo} className="btn-glow">
                 <Download className="w-4 h-4 mr-2" />
