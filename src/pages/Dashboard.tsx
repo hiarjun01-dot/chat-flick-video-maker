@@ -13,7 +13,7 @@ import {
   SidebarMenuButton,
   SidebarFooter,
 } from '@/components/ui/sidebar';
-import Header from '@/components/Header';
+import Header from '@/Header';
 
 const Dashboard: React.FC = () => {
   // Mock data for projects - this can be replaced with dynamic data from a store
